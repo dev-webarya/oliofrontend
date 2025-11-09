@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./index.css";
 import { useDispatch } from "react-redux";
-import { RegisterUser } from "./redux/features/users/userThunk";
-import { setToken } from "./utils/auth";
+import { postverifyingOtp, RegisterUser } from "./redux/features/users/userThunk";
 
 
 const Register = () => {
     const [username, setUsername] = useState({ role: "USER" });
     const navigate = useNavigate();
     const dispatch = useDispatch()
-    const [otpPageshow, setOtpPageShow] = useState(true);
+    const [otpPageshow, setOtpPageShow] = useState(false);
+    const [email, setEmail] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -18,6 +18,7 @@ const Register = () => {
             dispatch(RegisterUser(username)).unwrap()
                 .then((res) => {
                     if (res) {
+                        setEmail(username.username)
                         setOtpPageShow(true)
                     }
                 });
@@ -29,6 +30,19 @@ const Register = () => {
         setUsername(prev => ({ ...prev, [e.target.name]: e.target.value }))
     }
 
+    const verifyingOtp = (e)=>{
+        e.preventDefault();
+      let payload = {
+        "email": "casimir.malakie@fontfee.com",
+         "otp": username.otp    
+         }
+        dispatch(postverifyingOtp(payload)).unwrap().thne((res)=>{
+            if(res){
+                navigate("/login")
+            }
+        })
+    }
+
     return (
         <>
             {
@@ -37,7 +51,7 @@ const Register = () => {
                         <div className="login-container">
                             <div className="login-card">
                                 <h2 className="login-title">Verify OTP</h2>
-                                <form onSubmit={handleSubmit}>
+                                <form onSubmit={verifyingOtp}>
                                     <div className="form-group">
                                         <label>Enter OTP</label>
                                         <div className="otp-input-group">
