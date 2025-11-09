@@ -6,24 +6,20 @@ import { RegisterUser } from "./redux/features/users/userThunk";
 import { setToken } from "./utils/auth";
 
 
-
 const Register = () => {
     const [username, setUsername] = useState({role:"USER"});
     const navigate = useNavigate();
     const dispatch = useDispatch()
+    const [otpPageshow, setOtpPageShow] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (username.firstName && username.lastName && username.username && username.password && username.role) {
             dispatch(RegisterUser(username)).unwrap()
                 .then((res) => {
-                    // localStorage.setItem("token", res);
                     if (res) {
-                        setToken(JSON.stringify(res))
-                        navigate("/login");
+                        setOtpPageShow(true)
                     }
-
-
                 });
         } else {
             console.log("Please fill all fields")
@@ -34,7 +30,13 @@ const Register = () => {
     }
 
     return (
-        <div className="login-container">
+        <>
+        {
+            otpPageshow ? 
+                <>
+                
+                </> :
+                  <div className="login-container">
             <div className="login-card">
                 <h2 className="login-title">Register</h2>
                 <form onSubmit={handleSubmit}>
@@ -84,20 +86,6 @@ const Register = () => {
                             required
                         />
                     </div>
-                    {/* <div className="form-group">
-                        <label>Role</label>
-                        <select
-                            className="form-input"
-                            value={username.role}
-                            name="role"
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Select Role</option>
-                            <option value="ADMIN">Admin</option>
-                            <option value="USER">User</option>
-                        </select>
-                    </div> */}
                     <button type="submit" className="login-button">
                         Register
                     </button>
@@ -106,7 +94,9 @@ const Register = () => {
                     Already have an account? <Link to="/login">Login here</Link>
                 </p>
             </div>
-        </div>
+        </div> 
+        }
+        </>
     );
 };
 
