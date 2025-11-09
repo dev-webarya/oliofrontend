@@ -1,4 +1,5 @@
 import React from "react";
+import Logout from '../logout';
 
 const Navbar = () => {
   return (
@@ -17,6 +18,9 @@ const Navbar = () => {
             <li className="nav-item"><a href="#myBooking" className="nav-link">BookingTable</a></li>
             <li className="nav-item"><a href="#faq" className="nav-link">FAQ</a></li>
             <li className="nav-item"><a href="#contact" className="nav-link">Contact</a></li>
+            <li className="nav-item">
+              <Logout />
+            </li>
           </ul>
         </div>
       </div>
