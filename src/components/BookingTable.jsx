@@ -167,7 +167,7 @@ const BookingTable = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {driverBookings.map(b => (
+                    {Array.isArray(driverBookings) && driverBookings?.map(b => (
                         <tr key={b.id}>
                             <td>{b.passengerName}</td>
                             <td>{b.passengerMobileNumber}</td>

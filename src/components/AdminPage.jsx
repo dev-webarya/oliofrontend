@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import  { useState, useEffect, useCallback } from "react";
 import { deleteAdminCars, deleteAdminDrivers, getAdminCars, getAdminDrivers, getOptionsVichles, postAdminCars, postAdminDrivers } from "../redux/features/users/userThunk";
 import { useDispatch } from "react-redux";
-import MapboxAutocomplete from "./GoogleMapComponent";
 
 
 const initialDriver = {
@@ -26,6 +25,8 @@ const AdminPage = () => {
     const [carForm, setCarForm] = useState(initialCar);
     const [drivers, setDrivers] = useState([]);
     const [cars, setCars] = useState([]);
+    const [carrefresh ,setCarRefresh] = useState(false);
+     const [driverrefresh ,setDriverRefresh] = useState(false);
 
 
     const dispatch = useDispatch();
@@ -36,8 +37,9 @@ const AdminPage = () => {
     const getCarFunction = async () => {
         try {
             const data = await getOptionsVichles();
-            setvehicleTypes(data ? data?.map((ele) => ele.vehicleType) : [])
-            setCars(data || [])
+            console.log("data",data)
+            setvehicleTypes(data?.content ? data?.content?.map((ele) => ele.vehicleType) : [])
+            setCars(data?.content || [])
         } catch (err) {
             console.error(err);
         }
@@ -45,13 +47,13 @@ const AdminPage = () => {
 
     useEffect(() => {
         getCarFunction("option")
-    }, []);
+    }, [carrefresh]);
 
     useEffect(() => {
         dispatch(getAdminDrivers()).unwrap().then((res) => {
-            setDrivers(res || [])
+            setDrivers(res?.content || [])
         })
-    }, [])
+    }, [driverrefresh])  
 
 
     const handleDriverChange = (e) => {
@@ -86,18 +88,18 @@ const AdminPage = () => {
     };
 
     const handleCancelDriver = (id) => {
+          setLoading(true)
         dispatch(deleteAdminDrivers(id)).unwrap().then((res) => {
-            if (res) {
-                setLoading(pre => !pre)
-            }
+                setDriverRefresh(pre => !pre)
+             setLoading(false)
         })
     };
 
     const handleCancelCar = (id) => {
-        dispatch(deleteAdminCars(id)).unwrap().then((res) => {
-            if (res) {
-                setLoading(pre => !pre)
-            }
+        setLoading(true)
+        dispatch(deleteAdminCars(id)).unwrap().then(() => {
+                setCarRefresh(pre => !pre)
+                setLoading(false)
         })
     };
 
@@ -249,7 +251,7 @@ const AdminPage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {drivers.map((d, idx) => (
+                            {Array.isArray(drivers) && drivers?.map((d, idx) => (
                                 <tr key={d.id || d._id || idx}>
                                     <td>{d.firstName}</td>
                                     <td>{d.lastName}</td>
