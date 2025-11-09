@@ -8,7 +8,7 @@ import { setToken } from "./utils/auth";
 
 
 const Register = () => {
-    const [username, setUsername] = useState({});
+    const [username, setUsername] = useState({role:"USER"});
     const navigate = useNavigate();
     const dispatch = useDispatch()
 
@@ -84,7 +84,7 @@ const Register = () => {
                             required
                         />
                     </div>
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label>Role</label>
                         <select
                             className="form-input"
@@ -97,7 +97,7 @@ const Register = () => {
                             <option value="ADMIN">Admin</option>
                             <option value="USER">User</option>
                         </select>
-                    </div>
+                    </div> */}
                     <button type="submit" className="login-button">
                         Register
                     </button>
