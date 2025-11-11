@@ -33,10 +33,10 @@ const Register = () => {
     const verifyingOtp = (e)=>{
         e.preventDefault();
       let payload = {
-        "email": "casimir.malakie@fontfee.com",
+        "email": email,
          "otp": username.otp    
          }
-        dispatch(postverifyingOtp(payload)).unwrap().thne((res)=>{
+        dispatch(postverifyingOtp(payload)).unwrap().then((res)=>{
             if(res){
                 navigate("/login")
             }
