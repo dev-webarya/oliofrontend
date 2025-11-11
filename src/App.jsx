@@ -6,6 +6,7 @@ import './App.css';
 import Login from './login';
 import Register from './registration';
 import ProtectedLayout from './utils/ProtectedLayout';
+import ResetPassword from "./resetpassword";
 
 
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/blog/:id" element={<BlogDetail />} />
         <Route path="/home" element={< Home />} />
       </Route>
+      <Route path="/resetpassword" element={<ResetPassword />} />
     </Routes>
   );
 }
