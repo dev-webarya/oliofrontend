@@ -1,30 +1,13 @@
 import { useDispatch } from "react-redux";
 import React, { useState, useCallback } from "react";
-import { bookingCab, bookingDriver, getOptionsVichles } from "../redux/features/users/userThunk";
+import { bookingCab, bookingDriver, getOptionsVichles, priceCalculating } from "../redux/features/users/userThunk";
 
 import dayjs from "dayjs";
 import MapboxAutocomplete from "./GoogleMapComponent";
 import { useEffect } from "react";
 
 const Booking = () => {
-  const [mainTab, setMainTab] = useState("immediate");
-  const [subTabImmediate, setSubTabImmediate] = useState("cab");
-  const [subTabSchedule, setSubTabSchedule] = useState("cab");
-  const [vehicleTypes, setvehicleTypes] = useState([])
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await getOptionsVichles();
-        setvehicleTypes(data?.content ? data?.content?.map((ele) => ele.vehicleType) : [])
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, []);
-
-  const initialFormState = {
+   const initialFormState = {
     // Immediate Cab
     immediateCabType: "",
     name: "",
@@ -68,12 +51,32 @@ const Booking = () => {
     vehicleType: "",
     pickupTime: ""
   }
-
+  const [mainTab, setMainTab] = useState("immediate");
+  const [subTabImmediate, setSubTabImmediate] = useState("cab");
+  const [subTabSchedule, setSubTabSchedule] = useState("cab");
+  const [vehicleTypes, setvehicleTypes] = useState([])
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState(initialFormState);
   const [showTerminalField, setShowTerminalField] = useState(false);
 
   const [pickup, setPickup] = useState(null);
   const [drop, setDrop] = useState(null);
+  const [price, setPrice] = useState(null)
+
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getOptionsVichles();
+        setvehicleTypes(data?.content ? data?.content?.map((ele) => ele.vehicleType) : [])
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, []);
+
+ 
+
 
 
   const handlePickupSelect = useCallback((place) => {
@@ -118,7 +121,7 @@ const Booking = () => {
         "dropLat": drop?.lat,
         "dropLng": drop?.lng,
       }
- 
+
       dispatch(bookingCab(payload)).unwrap()
         .then((res) => {
           if (res) {
@@ -146,6 +149,26 @@ const Booking = () => {
         });
     }
   };
+
+
+  useEffect(() => {
+    if (drop && pickup) {
+      let payload =
+      {
+        "sourceLat": pickup?.lat,
+        "sourceLng": pickup?.lng,
+        "destLat": drop?.lat,
+        "destLng": drop?.lng,
+        "profile": "aaaa",
+        "strategySelector": "aaaa",
+        "requestedDurationSeconds": 0
+      }
+      dispatch(priceCalculating(payload)).unwrap().then((res) => {
+        setPrice(res)
+        console.lof(res,'res')
+      })
+    }
+  }, [drop, pickup])
 
 
 
@@ -442,7 +465,7 @@ const Booking = () => {
                               onSelect={handleDropSelect}
                             />
                           </div>
-                            <div className="form-group">
+                          <div className="form-group">
                             <label htmlFor="pickupDate">Start Time</label>
                             <input
                               type="date"
@@ -454,7 +477,7 @@ const Booking = () => {
                               onChange={handleInputChange}
                             />
                           </div>
-                            <div className="form-group">
+                          <div className="form-group">
                             <label htmlFor="dropDate">End Time</label>
                             <input
                               type="date"
@@ -599,8 +622,8 @@ const Booking = () => {
                               />
                             </div>
                           )}
-                      
-                         
+
+
                           <div className="form-group">
                             <label htmlFor="scheduleDate">Booking Date</label>
                             <input
@@ -698,7 +721,7 @@ const Booking = () => {
                               onSelect={handleDropSelect}
                             />
                           </div>
-                           <div className="form-group">
+                          <div className="form-group">
                             <label htmlFor="pickupDate">Start Time</label>
                             <input
                               type="date"
@@ -710,7 +733,7 @@ const Booking = () => {
                               onChange={handleInputChange}
                             />
                           </div>
-                            <div className="form-group">
+                          <div className="form-group">
                             <label htmlFor="dropDate">End Time</label>
                             <input
                               type="date"

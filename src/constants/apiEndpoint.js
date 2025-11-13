@@ -25,7 +25,8 @@ const apiEndpoint = {
   adminVehicles: "/api/v1/admin/vehicles",
   pendingDriverBookings: "/api/v1/admin/bookings/drivers/status/pending",
   pendingCarBooking: "/api/v1/admin/bookings/cars/status/pending",
-  verifyingOtp:"/api/v1/auth/verify-otp"
+  verifyingOtp:"/api/v1/auth/verify-otp",
+  priceCalcualting : "/api/v1/pricing/calculate"
 };
 
 export default apiEndpoint;
