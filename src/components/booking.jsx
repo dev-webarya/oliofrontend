@@ -1,30 +1,13 @@
 import { useDispatch } from "react-redux";
 import React, { useState, useCallback } from "react";
-import { bookingCab, bookingDriver, getOptionsVichles } from "../redux/features/users/userThunk";
+import { bookingCab, bookingDriver, getOptionsVichles, priceCalculating } from "../redux/features/users/userThunk";
 
 import dayjs from "dayjs";
 import MapboxAutocomplete from "./GoogleMapComponent";
 import { useEffect } from "react";
 
 const Booking = () => {
-  const [mainTab, setMainTab] = useState("immediate");
-  const [subTabImmediate, setSubTabImmediate] = useState("cab");
-  const [subTabSchedule, setSubTabSchedule] = useState("cab");
-  const [vehicleTypes, setvehicleTypes] = useState([])
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const data = await getOptionsVichles();
-        setvehicleTypes(data ? data?.map((ele) => ele.vehicleType) : [])
-      } catch (err) {
-        console.error(err);
-      }
-    })();
-  }, []);
-
-  const initialFormState = {
+   const initialFormState = {
     // Immediate Cab
     immediateCabType: "",
     name: "",
@@ -68,15 +51,34 @@ const Booking = () => {
     vehicleType: "",
     pickupTime: ""
   }
-
-  // Form states
+  const [mainTab, setMainTab] = useState("immediate");
+  const [subTabImmediate, setSubTabImmediate] = useState("cab");
+  const [subTabSchedule, setSubTabSchedule] = useState("cab");
+  const [vehicleTypes, setvehicleTypes] = useState([])
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState(initialFormState);
   const [showTerminalField, setShowTerminalField] = useState(false);
 
   const [pickup, setPickup] = useState(null);
   const [drop, setDrop] = useState(null);
+  const [price, setPrice] = useState(null)
 
-  // Memoize callbacks so they don't recreate on every render
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getOptionsVichles();
+        setvehicleTypes(data?.content ? data?.content?.map((ele) => ele.vehicleType) : [])
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, []);
+
+ 
+
+
+
   const handlePickupSelect = useCallback((place) => {
     setPickup(place);
     setFormData((pre) => ({ ...pre, pickupAddress: place?.name }))
@@ -87,15 +89,13 @@ const Booking = () => {
     setFormData((pre) => ({ ...pre, dropAddress: place?.name }))
   }, []);
 
-
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
-    // Show terminal field if airport is selected
+
     if (
       name === "immediateCabType" ||
       name === "driverCabType" ||
@@ -115,8 +115,13 @@ const Booking = () => {
         "pickupAddress": formData?.pickupAddress,
         "dropAddress": formData?.dropAddress,
         "vehicleType": formData?.vehicleType || "SUV",
-        "pickupTime": dayjs(new Date()).toISOString()
+        "pickupTime": formData?.scheduleDate ? dayjs(formData?.scheduleDate).toISOString() : null,
+        "pickupLat": pickup?.lat,
+        "pickupLng": pickup?.lng,
+        "dropLat": drop?.lat,
+        "dropLng": drop?.lng,
       }
+
       dispatch(bookingCab(payload)).unwrap()
         .then((res) => {
           if (res) {
@@ -129,8 +134,12 @@ const Booking = () => {
         "passengerMobileNumber": formData?.passengerMobileNumber,
         "pickupAddress": formData?.pickupAddress,
         "dropAddress": formData?.dropAddress,
-        "startTime": dayjs(new Date()).toISOString(),
-        "endTime": dayjs(new Date()).toISOString()
+        "startTime": dayjs(formData?.pickupDate).toISOString(),
+        "endTime": dayjs(formData?.dropDate).toISOString(),
+        "pickupLat": pickup?.lat,
+        "pickupLng": pickup?.lng,
+        "dropLat": drop?.lat,
+        "dropLng": drop?.lng,
       }
       dispatch(bookingDriver(payload)).unwrap()
         .then((res) => {
@@ -140,6 +149,26 @@ const Booking = () => {
         });
     }
   };
+
+
+  useEffect(() => {
+    if (drop && pickup) {
+      let payload =
+      {
+        "sourceLat": pickup?.lat,
+        "sourceLng": pickup?.lng,
+        "destLat": drop?.lat,
+        "destLng": drop?.lng,
+        "profile": "aaaa",
+        "strategySelector": "aaaa",
+        "requestedDurationSeconds": 0
+      }
+      dispatch(priceCalculating(payload)).unwrap().then((res) => {
+        setPrice(res)
+        console.lof(res,'res')
+      })
+    }
+  }, [drop, pickup])
 
 
 
@@ -315,19 +344,6 @@ const Booking = () => {
                             />
                           </div>
                           <div className="form-group">
-                            <label htmlFor="otp">OTP</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="otp"
-                              name="otp"
-                              placeholder="Enter OTP"
-                              value={formData.otp}
-                              onChange={handleInputChange}
-                              required
-                            />
-                          </div>
-                          <div className="form-group">
                             <label>Vehicle Type</label>
                             <select name="vehicleType" className="form-control" value={formData.vehicleType} onChange={handleInputChange} required>
                               <option value="">Select</option>
@@ -350,18 +366,6 @@ const Booking = () => {
                               label="Enter drop location..."
                               onSelect={handleDropSelect}
                             />
-
-                            {/* <input
-                              type="text"
-                              className="form-control"
-                              id="dropAddress"
-                              name="dropAddress"
-                              placeholder="Drop Location"
-                              value={formData.dropAddress}
-                              onChange={handleInputChange}
-                              required
-                            /> */}
-
                           </div>
                           {showTerminalField && (
                             <div className="form-group">
@@ -377,43 +381,6 @@ const Booking = () => {
                               />
                             </div>
                           )}
-                          <div className="form-group">
-                            <label htmlFor="passengers">Passengers</label>
-                            <input
-                              type="number"
-                              className="form-control"
-                              id="passengers"
-                              name="passengers"
-                              placeholder="Number of Passengers"
-                              value={formData.passengers}
-                              onChange={handleInputChange}
-                              required
-                            />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="luggage">Luggage</label>
-                            <input
-                              type="number"
-                              className="form-control"
-                              id="luggage"
-                              name="luggage"
-                              placeholder="Number of Luggage"
-                              value={formData.luggage}
-                              onChange={handleInputChange}
-                              required
-                            />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="comments">Comments</label>
-                            <textarea
-                              className="form-control"
-                              id="comments"
-                              name="comments"
-                              placeholder="Comment"
-                              value={formData.comments}
-                              onChange={handleInputChange}
-                            ></textarea>
-                          </div>
                           <div className="form-group">
                             <input
                               type="submit"
@@ -484,35 +451,12 @@ const Booking = () => {
                             />
                           </div>
                           <div className="form-group">
-                            <label htmlFor="driverOtp">OTP</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="driverOtp"
-                              name="driverOtp"
-                              placeholder="Enter OTP"
-                              value={formData.driverOtp}
-                              onChange={handleInputChange}
-                              required
-                            />
-                          </div>
-                          <div className="form-group">
 
                             <label htmlFor="pickupLocation">Pickup Location</label>
                             <MapboxAutocomplete
                               label="Enter pickup location..."
                               onSelect={handlePickupSelect}
                             />
-                            {/* <input
-                              type="text"
-                              className="form-control"
-                              id="driverPickupLocation"
-                              name="pickupAddress"
-                              placeholder="Pickup Location"
-                              value={formData.pickupAddress}
-                              onChange={handleInputChange}
-                              required
-                            /> */}
                           </div>
                           <div className="form-group">
                             <label htmlFor="dropAddress">Drop Location</label>
@@ -522,16 +466,27 @@ const Booking = () => {
                             />
                           </div>
                           <div className="form-group">
-                            <label htmlFor="numberOfDays">Number of Days</label>
+                            <label htmlFor="pickupDate">Start Time</label>
                             <input
-                              type="number"
+                              type="date"
                               className="form-control"
-                              id="numberOfDays"
-                              name="numberOfDays"
-                              placeholder="Number of Days"
-                              value={formData.numberOfDays}
+                              id="pickupDate"
+                              name="pickupDate"
+                              placeholder="Pickup Date"
+                              value={formData.pickupDate}
                               onChange={handleInputChange}
-                              required
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label htmlFor="dropDate">End Time</label>
+                            <input
+                              type="date"
+                              className="form-control"
+                              id="dropDate"
+                              name="dropDate"
+                              placeholder="Drop Date"
+                              value={formData.dropDate}
+                              onChange={handleInputChange}
                             />
                           </div>
                           <div className="form-group">
@@ -630,19 +585,6 @@ const Booking = () => {
                             />
                           </div>
                           <div className="form-group">
-                            <label htmlFor="scheduleOtp">OTP</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="scheduleOtp"
-                              name="scheduleOtp"
-                              placeholder="Enter OTP"
-                              value={formData.scheduleOtp}
-                              onChange={handleInputChange}
-                              required
-                            />
-                          </div>
-                          <div className="form-group">
                             <label>Vehicle Type</label>
                             <select name="vehicleType" className="form-control" value={formData.vehicleType} onChange={handleInputChange} required>
                               <option value="">Select</option>
@@ -680,30 +622,8 @@ const Booking = () => {
                               />
                             </div>
                           )}
-                          <div className="form-group">
-                            <label htmlFor="dropDate">Drop Date</label>
-                            <input
-                              type="date"
-                              className="form-control"
-                              id="dropDate"
-                              name="dropDate"
-                              placeholder="Drop Date"
-                              value={formData.dropDate}
-                              onChange={handleInputChange}
-                            />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="pickupDate">Pickup Date</label>
-                            <input
-                              type="date"
-                              className="form-control"
-                              id="pickupDate"
-                              name="pickupDate"
-                              placeholder="Pickup Date"
-                              value={formData.pickupDate}
-                              onChange={handleInputChange}
-                            />
-                          </div>
+
+
                           <div className="form-group">
                             <label htmlFor="scheduleDate">Booking Date</label>
                             <input
@@ -713,19 +633,6 @@ const Booking = () => {
                               name="scheduleDate"
                               placeholder="Booking Date"
                               value={formData.scheduleDate}
-                              onChange={handleInputChange}
-                              required
-                            />
-                          </div>
-                          <div className="form-group">
-                            <label htmlFor="schedulePassengers">Passengers</label>
-                            <input
-                              type="number"
-                              className="form-control"
-                              id="schedulePassengers"
-                              name="schedulePassengers"
-                              placeholder="Number of Passengers"
-                              value={formData.schedulePassengers}
                               onChange={handleInputChange}
                               required
                             />
@@ -775,7 +682,6 @@ const Booking = () => {
                         <form onSubmit={handleSubmit} className="request-form">
                           <div className="form-group">
                             <label htmlFor="scheduleDriverName"> Name</label>
-
                             <input
                               type="text"
                               className="form-control"
@@ -801,19 +707,6 @@ const Booking = () => {
                             />
                           </div>
                           <div className="form-group">
-                            <label htmlFor="scheduleDriverOtp">OTP</label>
-                            <input
-                              type="text"
-                              className="form-control"
-                              id="scheduleDriverOtp"
-                              name="scheduleDriverOtp"
-                              placeholder="Enter OTP"
-                              value={formData.scheduleDriverOtp}
-                              onChange={handleInputChange}
-                              required
-                            />
-                          </div>
-                          <div className="form-group">
 
                             <label htmlFor="pickupLocation">Pickup Location</label>
                             <MapboxAutocomplete
@@ -823,15 +716,33 @@ const Booking = () => {
                           </div>
                           <div className="form-group">
                             <label htmlFor="scheduleDriverdropAddress">Drop Location</label>
+                            <MapboxAutocomplete
+                              label="Enter pickup location..."
+                              onSelect={handleDropSelect}
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label htmlFor="pickupDate">Start Time</label>
                             <input
-                              type="text"
+                              type="date"
                               className="form-control"
-                              id="scheduleDriverdropAddress"
-                              name="dropAddress"
-                              placeholder="Drop Location"
-                              value={formData.dropAddress}
+                              id="pickupDate"
+                              name="pickupDate"
+                              placeholder="Pickup Date"
+                              value={formData.pickupDate}
                               onChange={handleInputChange}
-                              required
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label htmlFor="dropDate">End Time</label>
+                            <input
+                              type="date"
+                              className="form-control"
+                              id="dropDate"
+                              name="dropDate"
+                              placeholder="Drop Date"
+                              value={formData.dropDate}
+                              onChange={handleInputChange}
                             />
                           </div>
                           <div className="form-group">

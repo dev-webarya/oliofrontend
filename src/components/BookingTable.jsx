@@ -24,7 +24,7 @@ const BookingTable = () => {
                 setCabBookings(res || [])
             })
             dispatch(getPendingDriver()).unwrap().then((res) => {
-                setDriverBookings(res || [])
+                setDriverBookings(res?.content || [])
             })
         }
     }, [loading])
@@ -140,10 +140,10 @@ const BookingTable = () => {
                             <td>{b.pickupAddress}</td>
                             <td>{b.dropAddress}</td>
                             <td style={{ display: "flex", gap: "2px" }}>
-                                {Role?.role !== "USER" ? <button className="cancel-btn" onClick={() => handleCancelCab(b?.vehicle?.id, "approve")}>
+                                {Role?.role !== "USER" ? <button className="cancel-btn" onClick={() => handleCancelCab(b?.id, "approve")}>
                                     Approve
                                 </button> :
-                                    <button className="cancel-btn" onClick={() => handleCancelCab(b?.vehicle?.id, "cancel")}>
+                                    <button className="cancel-btn" onClick={() => handleCancelCab(b?.id, "cancel")}>
                                         Cancel
                                     </button>}
                             </td>
@@ -178,10 +178,10 @@ const BookingTable = () => {
                             <td>{b.dropAddress}</td>
                             <td >
                                 {Role?.role !== "USER" ?
-                                    <button className="cancel-btn" onClick={() => handleCancelDriver(b?.driver?.id, "approve")}>
+                                    <button className="cancel-btn" onClick={() => handleCancelDriver(b?.id, "approve")}>
                                         Approve
                                     </button> :
-                                    <button className="cancel-btn" onClick={() => handleCancelDriver(b?.driver?.id, "cancel")}>
+                                    <button className="cancel-btn" onClick={() => handleCancelDriver(b?.id, "cancel")}>
                                         Cancel
                                     </button>}
                             </td>
@@ -191,6 +191,6 @@ const BookingTable = () => {
             </table>
         </div>
     );
-};
+}
 
 export default BookingTable;

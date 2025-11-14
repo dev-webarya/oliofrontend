@@ -201,3 +201,33 @@ export const getOptionsVichles = async () => {
     throw error;
   }
 };
+
+
+export const postverifyingOtp = createAsyncThunk(
+  "user/AdminDrivers verifyinh otp",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.post(apiEnpoint.verifyingOtp, data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Registration failed");
+    }
+  }
+);
+
+
+
+export const priceCalculating = createAsyncThunk(
+  "user/AdminDrivers verifyinh otp",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.post(apiEnpoint.priceCalcualting, data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Registration failed");
+    }
+  }
+);
+
+
+
