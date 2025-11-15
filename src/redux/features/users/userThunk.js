@@ -229,5 +229,27 @@ export const priceCalculating = createAsyncThunk(
   }
 );
 
+export const sendforgototp = createAsyncThunk(
+  "forgot verifyinh otp",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.post(apiEnpoint.requestOtp, data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Registration failed");
+    }
+  }
+);
+// /api/v1/auth/reset-password
 
-
+export const resetPassword = createAsyncThunk(
+  "forgot reset password",
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await api.post(apiEnpoint.resetPassword, data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || "Reset password failed");
+    }
+  }
+);

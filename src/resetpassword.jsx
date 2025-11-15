@@ -1,171 +1,171 @@
 import React, { useState } from "react";
 
 const ResetPassword = () => {
-    const [step, setStep] = useState(1); // 1: email, 2: otp, 3: new password
-    const [email, setEmail] = useState("");
-    const [otp, setOtp] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirm, setConfirm] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [msg, setMsg] = useState("");
-    const [error, setError] = useState("");
+  const [step, setStep] = useState(1); // 1: email, 2: otp, 3: new password
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
 
-    // Simulate API
-    const handleSendOtp = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
-        setMsg("");
-        setTimeout(() => {
-            setLoading(false);
-            setStep(2);
-            setMsg("OTP sent to your email.");
-        }, 1000);
-    };
+  // Simulate API
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setMsg("");
+    setTimeout(() => {
+      setLoading(false);
+      setStep(2);
+      setMsg("OTP sent to your email.");
+    }, 1000);
+  };
 
-    const handleVerifyOtp = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
-        setMsg("");
-        setTimeout(() => {
-            if (otp === "123456") {
-                setStep(3);
-                setMsg("OTP verified. Please set your new password.");
-            } else {
-                setError("Invalid OTP. Please try again.");
-            }
-            setLoading(false);
-        }, 1000);
-    };
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setMsg("");
+    setTimeout(() => {
+      if (otp === "123456") {
+        setStep(3);
+        setMsg("OTP verified. Please set your new password.");
+      } else {
+        setError("Invalid OTP. Please try again.");
+      }
+      setLoading(false);
+    }, 1000);
+  };
 
-    const handleResetPassword = async (e) => {
-        e.preventDefault();
-        setLoading(true);
-        setError("");
-        setMsg("");
-        if (newPassword !== confirm) {
-            setError("Passwords do not match.");
-            setLoading(false);
-            return;
-        }
-        setTimeout(() => {
-            setLoading(false);
-            setMsg("Password reset successful! You can now log in.");
-            setStep(4);
-        }, 1000);
-    };
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setMsg("");
+    if (newPassword !== confirm) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+    setTimeout(() => {
+      setLoading(false);
+      setMsg("Password reset successful! You can now log in.");
+      setStep(4);
+    }, 1000);
+  };
 
-    const handleResendOtp = () => {
-        setMsg("OTP resent to your email.");
-        setError("");
-    };
+  const handleResendOtp = () => {
+    setMsg("OTP resent to your email.");
+    setError("");
+  };
 
-    return (
-        <div className="center-bg">
-            <div className="center-card">
-                <h2 className="center-title">
-                    {step === 1 && "Forgot Password"}
-                    {step === 2 && "Verify OTP"}
-                    {step === 3 && "Reset Password"}
-                    {step === 4 && "Success"}
-                </h2>
+  return (
+    <div className="center-bg">
+      <div className="center-card">
+        <h2 className="center-title">
+          {step === 1 && "Forgot Password"}
+          {step === 2 && "Verify OTP"}
+          {step === 3 && "Reset Password"}
+          {step === 4 && "Success"}
+        </h2>
 
-                {msg && <div className="center-msg">{msg}</div>}
-                {error && <div className="center-error">{error}</div>}
+        {msg && <div className="center-msg">{msg}</div>}
+        {error && <div className="center-error">{error}</div>}
 
-                {step === 1 && (
-                    <form onSubmit={handleSendOtp}>
-                        <label className="center-label">Email</label>
-                        <input
-                            type="email"
-                            className="center-input"
-                            placeholder="Enter your email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                        <button type="submit" className="center-btn" disabled={loading}>
-                            {loading ? "Sending OTP..." : "Send OTP"}
-                        </button>
-                    </form>
-                )}
+        {step === 1 && (
+          <form onSubmit={handleSendOtp}>
+            <label className="center-label">Email</label>
+            <input
+              type="email"
+              className="center-input"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <button type="submit" className="center-btn" disabled={loading}>
+              {loading ? "Sending OTP..." : "Send OTP"}
+            </button>
+          </form>
+        )}
 
-                {step === 2 && (
-                    <form onSubmit={handleVerifyOtp}>
-                        <label className="center-label">Enter OTP</label>
-                        <input
-                            type="text"
-                            className="center-input"
-                            placeholder="6-digit OTP"
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
-                            maxLength={6}
-                            required
-                        />
-                        <button type="submit" className="center-btn" disabled={loading}>
-                            {loading ? "Verifying..." : "Verify OTP"}
-                        </button>
-                        <button
-                            type="button"
-                            className="center-btn-outline"
-                            onClick={handleResendOtp}
-                            disabled={loading}
-                        >
-                            Resend OTP
-                        </button>
-                    </form>
-                )}
+        {step === 2 && (
+          <form onSubmit={handleVerifyOtp}>
+            <label className="center-label">Enter OTP</label>
+            <input
+              type="text"
+              className="center-input"
+              placeholder="6-digit OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              maxLength={6}
+              required
+            />
+            <button type="submit" className="center-btn" disabled={loading}>
+              {loading ? "Verifying..." : "Verify OTP"}
+            </button>
+            <button
+              type="button"
+              className="center-btn-outline"
+              onClick={handleResendOtp}
+              disabled={loading}
+            >
+              Resend OTP
+            </button>
+          </form>
+        )}
 
-                {step === 3 && (
-                    <form onSubmit={handleResetPassword}>
-                        <label className="center-label">New Password</label>
-                        <input
-                            type="password"
-                            className="center-input"
-                            placeholder="New password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                        />
-                        <label className="center-label">Confirm Password</label>
-                        <input
-                            type="password"
-                            className="center-input"
-                            placeholder="Confirm password"
-                            value={confirm}
-                            onChange={(e) => setConfirm(e.target.value)}
-                            required
-                        />
-                        <button type="submit" className="center-btn" disabled={loading}>
-                            {loading ? "Resetting..." : "Reset Password"}
-                        </button>
-                    </form>
-                )}
+        {step === 3 && (
+          <form onSubmit={handleResetPassword}>
+            <label className="center-label">New Password</label>
+            <input
+              type="password"
+              className="center-input"
+              placeholder="New password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+            <label className="center-label">Confirm Password</label>
+            <input
+              type="password"
+              className="center-input"
+              placeholder="Confirm password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+            />
+            <button type="submit" className="center-btn" disabled={loading}>
+              {loading ? "Resetting..." : "Reset Password"}
+            </button>
+          </form>
+        )}
 
-                {step === 4 && (
-                    <div className="center-success">
-                        <div className="center-success-icon">✔</div>
-                        <div className="center-success-msg">
-                            Your password has been reset successfully.
-                        </div>
-                        <a
-                            href="/login"
-                            className="center-btn"
-                            style={{ textAlign: "center" }}
-                        >
-                            Go to Login
-                        </a>
-                    </div>
-                )}
-
-                <div className="center-footer">
-                    <a href="/login" className="center-link">
-                        Back to Login
-                    </a>
-                </div>
+        {step === 4 && (
+          <div className="center-success">
+            <div className="center-success-icon">✔</div>
+            <div className="center-success-msg">
+              Your password has been reset successfully.
             </div>
-            <style>{`
+            <a
+              href="/login"
+              className="center-btn"
+              style={{ textAlign: "center" }}
+            >
+              Go to Login
+            </a>
+          </div>
+        )}
+
+        <div className="center-footer">
+          <a href="/login" className="center-link">
+            Back to Login
+          </a>
+        </div>
+      </div>
+      <style>{`
 .center-bg {
   min-height: 100vh;
   display: flex;
@@ -293,8 +293,8 @@ const ResetPassword = () => {
   }
 }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default ResetPassword;

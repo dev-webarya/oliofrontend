@@ -7,6 +7,8 @@ import Login from './login';
 import Register from './registration';
 import ProtectedLayout from './utils/ProtectedLayout';
 import ResetPassword from "./resetpassword";
+import Settings from './components/Settings';
+import Profile from './components/Profile';
 
 
 
@@ -22,6 +24,8 @@ function App() {
         <Route path="/home" element={< Home />} />
       </Route>
       <Route path="/resetpassword" element={<ResetPassword />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/profile" element={<Profile />} />
     </Routes>
   );
 }

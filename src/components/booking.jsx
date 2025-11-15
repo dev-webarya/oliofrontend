@@ -7,7 +7,7 @@ import MapboxAutocomplete from "./GoogleMapComponent";
 import { useEffect } from "react";
 
 const Booking = () => {
-   const initialFormState = {
+  const initialFormState = {
     // Immediate Cab
     immediateCabType: "",
     name: "",
@@ -75,7 +75,7 @@ const Booking = () => {
     })();
   }, []);
 
- 
+
 
 
 
@@ -159,13 +159,13 @@ const Booking = () => {
         "sourceLng": pickup?.lng,
         "destLat": drop?.lat,
         "destLng": drop?.lng,
-        "profile": "aaaa",
-        "strategySelector": "aaaa",
-        "requestedDurationSeconds": 0
+        // "profile": "aaaa",
+        // "strategySelector": "aaaa",
+        // "requestedDurationSeconds": 0
       }
       dispatch(priceCalculating(payload)).unwrap().then((res) => {
         setPrice(res)
-        console.lof(res,'res')
+        console.lof(res, 'res')
       })
     }
   }, [drop, pickup])
